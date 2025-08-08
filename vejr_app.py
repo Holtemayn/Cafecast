@@ -127,7 +127,7 @@ st.dataframe(
 # ----------------------
 fig = go.Figure()
 fig.add_trace(go.Bar(x=df_results["Dato"], y=df_results["precip_sum"], name="Nedbør (mm)", yaxis="y"))
-fig.add_trace(go.Bar(x=df_results["Dato"], y=df_results["sunshine_hours"], name="Solskinstimer", yaxis="y"))
+fig.add_trace(go.Bar(x=df_results["Dato"], y=df_results["sunshine_hours"], name="Solskinstimer", yaxis="y", marker_color="gold"))
 fig.add_trace(go.Scatter(x=df_results["Dato"], y=df_results["predicted_revenue"], name="Omsætning (kr)", mode="lines+markers", yaxis="y2"))
 
 fig.update_layout(
