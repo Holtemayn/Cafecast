@@ -95,57 +95,69 @@ st.write("**Based on 10-day weather forecast and regression model**")
 df_weather = fetch_weather()
 df_forecast = predict_revenue(df_weather)
 
-# Formatér time-kolonnen til kun dato
-vis_df = df_forecast.copy()
-vis_df['time'] = vis_df['time'].dt.strftime('%Y-%m-%d')
+# ----------------------
+#  VISNING – to tabeller (danske kolonnenavne, sorteret + ens datoformat)
+# ----------------------
 
-st.subheader("Forecast Table")
+# Sortér efter tid og lav datostreng
+df_results = df_forecast.sort_values("time").copy()
+df_results["Dato"] = df_results["time"].dt.strftime("%Y-%m-%d")
+
+# Øverste tabel: Resultater
+st.subheader("📊 Forventet omsætning og bemanding")
+df_top = df_results[["Dato", "predicted_revenue", "predicted_medarbejder_timer"]].rename(
+    columns={
+        "predicted_revenue": "Omsætning (kr)",
+        "predicted_medarbejder_timer": "Medarbejdertimer"
+    }
+)
 st.dataframe(
-    vis_df.style.format({
-        'temp_max': '{:.1f}',
-        'wind_max': '{:.1f}',
-        'precip_sum': '{:.1f}',
-        'sunshine_hours': '{:.1f}',
-        'predicted_revenue': '{:.0f} kr',
-        'predicted_medarbejder_timer': '{:.1f} timer'
+    df_top.style.format({
+        "Omsætning (kr)": "{:.0f} kr",
+        "Medarbejdertimer": "{:.1f} timer"
     }),
-    hide_index=True
+    hide_index=True,
+    use_container_width=True
 )
 
-# Fjern eksisterende grafer og tilføj ét samlet søjlediagram
-import plotly.graph_objects as go
-
-# Normaliser værdier for at kunne sammenligne på samme akse
-vis_df['revenue_norm'] = vis_df['predicted_revenue'] / vis_df['predicted_revenue'].max()
-vis_df['sun_norm'] = vis_df['sunshine_hours'] / vis_df['sunshine_hours'].max()
-vis_df['rain_norm'] = vis_df['precip_sum'] / vis_df['precip_sum'].max()
-
-# Kombineret diagram med to y-akser
+# ----------------------
+# GRAF
+# ----------------------
 fig = go.Figure()
-
-# Nedbør (søjle)
-fig.add_trace(go.Bar(x=vis_df['time'], y=vis_df['precip_sum'], name='Nedbør (mm)', marker_color='royalblue', yaxis='y'))
-# Solskinstimer (søjle)
-fig.add_trace(go.Bar(x=vis_df['time'], y=vis_df['sunshine_hours'], name='Solskinstimer', marker_color='gold', yaxis='y'))
-# Omsætning (linje)
-fig.add_trace(go.Scatter(x=vis_df['time'], y=vis_df['predicted_revenue'], name='Omsætning', mode='lines+markers', marker_color='firebrick', yaxis='y2'))
+fig.add_trace(go.Bar(x=df_results["Dato"], y=df_results["precip_sum"], name="Nedbør (mm)", yaxis="y"))
+fig.add_trace(go.Bar(x=df_results["Dato"], y=df_results["sunshine_hours"], name="Solskinstimer", yaxis="y"))
+fig.add_trace(go.Scatter(x=df_results["Dato"], y=df_results["predicted_revenue"], name="Omsætning (kr)", mode="lines+markers", yaxis="y2"))
 
 fig.update_layout(
-    barmode='group',
-    title='Nedbør, Solskinstimer og Omsætning',
-    xaxis_title='Dato',
-    yaxis=dict(
-        title='Nedbør (mm) / Solskinstimer',
-        side='left',
-        showgrid=False
-    ),
-    yaxis2=dict(
-        title='Omsætning (kr)',
-        overlaying='y',
-        side='right',
-        showgrid=False
-    ),
-    legend_title='Parameter',
-    height=500
+    barmode="group",
+    title="Nedbør, Solskinstimer og Omsætning",
+    xaxis_title="Dato",
+    yaxis=dict(title="Nedbør (mm) / Solskinstimer", side="left", showgrid=False),
+    yaxis2=dict(title="Omsætning (kr)", overlaying="y", side="right", showgrid=True),
+    legend_title="Parameter",
+    height=520
 )
 st.plotly_chart(fig, use_container_width=True)
+
+# ----------------------
+# Nederste tabel: Vejrvariabler
+# ----------------------
+st.subheader("🌤 Vejrdata pr. dag")
+df_weather_vars = df_results[["Dato", "temp_max", "wind_max", "precip_sum", "sunshine_hours"]].rename(
+    columns={
+        "temp_max": "Temp. maks (°C)",
+        "wind_max": "Vind maks (m/s)",
+        "precip_sum": "Nedbør (mm)",
+        "sunshine_hours": "Solskinstimer"
+    }
+)
+st.dataframe(
+    df_weather_vars.style.format({
+        "Temp. maks (°C)": "{:.1f}",
+        "Vind maks (m/s)": "{:.1f}",
+        "Nedbør (mm)": "{:.1f}",
+        "Solskinstimer": "{:.1f}"
+    }),
+    hide_index=True,
+    use_container_width=True
+)
