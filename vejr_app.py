@@ -114,12 +114,14 @@ df_top = df_results[["Dato", "predicted_revenue", "predicted_medarbejder_timer"]
     }
 )
 st.dataframe(
-    df_top.style.format({
-        "Omsætning (kr)": "{:.0f} kr",
-        "Medarbejdertimer": "{:.1f} timer"
-    }),
+    df_top,
     hide_index=True,
-    use_container_width=True
+    use_container_width=True,
+    column_config={
+        "Dato": st.column_config.TextColumn("Dato"),
+        "Omsætning (kr)": st.column_config.NumberColumn("Omsætning (kr)", format="%.0f kr"),
+        "Medarbejdertimer": st.column_config.NumberColumn("Medarbejdertimer", format="%.1f timer")
+    }
 )
 
 # ----------------------
@@ -154,12 +156,14 @@ df_weather_vars = df_results[["Dato", "temp_max", "wind_max", "precip_sum", "sun
     }
 )
 st.dataframe(
-    df_weather_vars.style.format({
-        "Temp. maks (°C)": "{:.1f}",
-        "Vind maks (m/s)": "{:.1f}",
-        "Nedbør (mm)": "{:.1f}",
-        "Solskinstimer": "{:.1f}"
-    }),
+    df_weather_vars,
     hide_index=True,
-    use_container_width=True
+    use_container_width=True,
+    column_config={
+        "Dato": st.column_config.TextColumn("Dato"),
+        "Temp. maks (°C)": st.column_config.NumberColumn("Temp. maks (°C)", format="%.1f"),
+        "Vind maks (m/s)": st.column_config.NumberColumn("Vind maks (m/s)", format="%.1f"),
+        "Nedbør (mm)": st.column_config.NumberColumn("Nedbør (mm)", format="%.1f"),
+        "Solskinstimer": st.column_config.NumberColumn("Solskinstimer", format="%.1f")
+    }
 )
