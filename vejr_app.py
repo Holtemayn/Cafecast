@@ -89,9 +89,9 @@ def predict_revenue(df):
 # ----------------------
 # 3. Streamlit Dashboard
 # ----------------------
-st.title("☀️ Café Revenue Forecast Dashboard")
+st.title("☀️ Forecast")
 
-st.write("**Based on 10-day weather forecast and regression model**")
+st.write("**Baseret på linær regressions-model og real-time vejrudsigt")
 
 # Fetch and calculate
 df_weather = fetch_weather()
@@ -146,7 +146,7 @@ st.plotly_chart(fig, use_container_width=True)
 # ----------------------
 # Nederste tabel: Vejrvariabler
 # ----------------------
-st.subheader("🌤 Vejrdata pr. dag")
+st.subheader("🌤 Vejr-udsigt, København")
 df_weather_vars = df_results[["Dato", "temp_max", "wind_max", "precip_sum", "sunshine_hours"]].rename(
     columns={
         "temp_max": "Temp. maks (°C)",
